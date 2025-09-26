@@ -1,6 +1,7 @@
 import joblib
 from fastapi import FastAPI
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 
 
 class ClientData(BaseModel):
@@ -14,6 +15,14 @@ class ClientData(BaseModel):
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # restrict in prod
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Load artifacts
 model = joblib.load("model.pkl")
 feature_cols = joblib.load("feature_cols.pkl")  # must be the 6 columns above
@@ -25,7 +34,6 @@ def hom_own(x):
     if key not in mapping:
         raise ValueError("home_ownership must be one of: other, rent, mortgage, own")
     return float(mapping[key])
-
 
 
 @app.post("/score")
@@ -43,4 +51,5 @@ def score(data: ClientData):
     yhat = model.predict(X)[0].item()  # assuming 1 = “deny”
     approved = not yhat
     return {"approved": bool(approved)}
+
 
