@@ -8,8 +8,10 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY service.py my_preprocessing.py model.pkl feature_cols.pkl ./
+COPY backend/ ./backend/
+
+
 
 EXPOSE 8004
 
-CMD ["uvicorn", "service:app", "--host", "0.0.0.0", "--port", "8004"]
+CMD ["uvicorn", "backend.service:app", "--host", "0.0.0.0", "--port", "8004"]

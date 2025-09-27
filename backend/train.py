@@ -4,9 +4,9 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import precision_score, recall_score
-from my_preprocessing import preprocess, FEATURE_COLS, TARGET
+from backend.my_preprocessing import preprocess, FEATURE_COLS, TARGET
 
-csv_path = os.path.join("credit-risk-dataset", "credit_risk_dataset.csv")
+csv_path = os.path.join("./credit-risk-dataset", "credit_risk_dataset.csv")
 df = pd.read_csv(csv_path)
 data = preprocess(df)
 
@@ -27,6 +27,6 @@ print(f"Rejected: {y_pred.mean() * 100:.0f}%")
 print(f"Precision: {precision * 100:.0f}%")
 print(f"Recall: {recall * 100:.0f}%")
 
-joblib.dump(model, "model.pkl")
-joblib.dump(FEATURE_COLS, "feature_cols.pkl")
+joblib.dump(model, "./backend/model.pkl")
+joblib.dump(FEATURE_COLS, "./backend/feature_cols.pkl")
 

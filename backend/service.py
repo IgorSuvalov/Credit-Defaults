@@ -3,7 +3,6 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
-
 class ClientData(BaseModel):
     age: int
     income: int
@@ -15,10 +14,19 @@ class ClientData(BaseModel):
 
 app = FastAPI()
 
+origins = ["http://localhost:5173"]
 
-# Load artifacts
-model = joblib.load("model.pkl")
-feature_cols = joblib.load("feature_cols.pkl")  # must be the 6 columns above
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Load model and feature columns
+model = joblib.load("backend/model.pkl")
+feature_cols = joblib.load("backend/feature_cols.pkl")
 
 
 def hom_own(x):
@@ -31,7 +39,7 @@ def hom_own(x):
 
 @app.post("/score")
 def score(data: ClientData):
-    # build a row aligned to training-time feature order
+
     row = {
         "person_age": data.age,
         "person_income": data.income,
@@ -40,9 +48,7 @@ def score(data: ClientData):
         "loan_amnt": data.loan_amount,
         "cb_person_default_on_file": data.def_on_file,
     }
-    X = [[row[c] for c in feature_cols]]  # shape (1, 6)
-    yhat = model.predict(X)[0].item()  # assuming 1 = “deny”
+    X = [[row[c] for c in feature_cols]]
+    yhat = model.predict(X)[0].item()  # 1 is default predicted, 0 is approved
     approved = not yhat
-    return {"approved": bool(approved)}
-
-
+    return {"approved": approved}
