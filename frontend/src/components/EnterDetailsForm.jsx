@@ -10,7 +10,7 @@ export default function EnterDetailsForm({ onResult }) {
   const [empLength, setEmpLength] = useState("");
   const [loanAmount, setLoanAmount] = useState("");
   const [defOnFile, setDefOnFile] = useState("no");
-
+  const [loanIntent, setLoanIntent] = useState("personal");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -39,7 +39,10 @@ export default function EnterDetailsForm({ onResult }) {
       employment_length: Number(empLength),
       loan_amount: Number(loanAmount),
       def_on_file: defOnFile === "yes" ? 1 : 0,
+      loan_intent: loanIntent,
     };
+
+    console.log("Payload being sent:", payload);
 
     setLoading(true);
     try {
@@ -86,6 +89,16 @@ export default function EnterDetailsForm({ onResult }) {
           <select className="select" value={defOnFile} onChange={(e)=>setDefOnFile(e.target.value)}>
             <option value="no">No</option>
             <option value="yes">Yes</option>
+          </select>
+        </div>
+        <div style={{ gridColumn: "1 / -1" }}>
+          <label className="label">Loan Intent</label>
+          <select className="select" value={loanIntent} onChange={(e)=>setLoanIntent(e.target.value)}>
+            <option value="personal">Personal</option>
+            <option value="education">Education</option>
+            <option value="medical">Medical</option>
+            <option value="venture">Venture</option>
+            <option value="homeimprovement">Home Improvement</option>
           </select>
         </div>
       </div>

@@ -5,7 +5,7 @@ import xgboost as xgb
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-
+from fastapi import Request
 
 class ClientData(BaseModel):
     age: int
@@ -19,7 +19,7 @@ class ClientData(BaseModel):
 
 app = FastAPI()
 
-origins = ["http://localhost:5173"]
+origins = ["http://localhost:5173", "http://localhost:8004"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -42,6 +42,8 @@ if not FEATURE_COLS_PKL.exists():
     raise RuntimeError(f"Missing feature columns file: {FEATURE_COLS_PKL}")
 
 feature_cols = joblib.load(FEATURE_COLS_PKL)
+
+print("feature_cols".upper())
 
 # Try to load as sklearn wrapper first; if that fails, fall back to Booster
 _MODEL_MODE = "sklearn"
@@ -67,6 +69,7 @@ def hom_own(x):
 
 @app.post("/score")
 def score(data: ClientData):
+
     row = {
         "person_age": data.age,
         "person_income": data.income,
@@ -76,7 +79,7 @@ def score(data: ClientData):
         "cb_person_default_on_file": data.def_on_file,
     }
 
-    intent_key = str(data.loan_intent).strip().lower()
+    intent_key = str(data.loan_intent).strip().upper()
 
     X_row = []
     for col in feature_cols:

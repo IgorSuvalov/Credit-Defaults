@@ -103,12 +103,12 @@ print("f1 score:", f"{f1_score(y_test, y_pred) * 100:.0f}%")
 out_dir = Path("./backend")
 out_dir.mkdir(parents=True, exist_ok=True)
 
+# Below is the result of debugging...
+
 if trained_with_classifier:
-    # sklearn wrapper was fitted → safe to save through wrapper
     model.save_model(out_dir / "xgboost.json")
     joblib.dump(feature_cols, out_dir / "feature_cols.pkl")
 else:
-    # Booster path → save the booster
-    booster = bst                          # make sure `bst` is in scope here
+    booster = bst
     booster.save_model(out_dir / "xgboost.json")
     joblib.dump(feature_cols, out_dir / "feature_cols.pkl")
