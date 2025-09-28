@@ -10,6 +10,7 @@ class ClientData(BaseModel):
     employment_length: float
     loan_amount: int
     def_on_file: float
+    loan_intent: str
 
 
 app = FastAPI()
@@ -48,7 +49,19 @@ def score(data: ClientData):
         "loan_amnt": data.loan_amount,
         "cb_person_default_on_file": data.def_on_file,
     }
-    X = [[row[c] for c in feature_cols]]
-    yhat = model.predict(X)[0].item()  # 1 is default predicted, 0 is approved
+
+    intent_key = str(data.loan_intent).strip().lower()
+
+    X_row = []
+    for col in row:
+        if col in row:
+            X_row.append(row[col])
+        elif col.startswith("loan_intent_"):
+            intent_value = col.replace("loan_intent_", "")
+            X_row.append(1.0 if intent_value == intent_key else 0.0)
+        else:
+            X_row.append(0.0)
+
+    yhat = model.predict([X_row])[0].item()  # 1 is default predicted, 0 is approved
     approved = not yhat
     return {"approved": approved}

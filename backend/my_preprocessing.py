@@ -40,6 +40,7 @@ def preprocess(df):
 
     df["cb_person_default_on_file"] = yn_to01(df["cb_person_default_on_file"])
     df["person_home_ownership"] = hom_own(df["person_home_ownership"])
+    df = pd.get_dummies(df, columns=["loan_intent"], prefix="loan_intent", drop_first=True)
 
     df = df.dropna()
 
