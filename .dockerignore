@@ -1,8 +1,42 @@
+# Byte-compiled / cache
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
+*.pyd
+*.tmp
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+
+# Jupyter & notebooks
+*.ipynb
 .ipynb_checkpoints/
-.git
+Notebooks/
+
+# Node & frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+*.log
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Config & secrets
 .env
+.env.*
+*.secret
+*.key
+
+# Kaggle downloads & raw data (if you rebuild inside container)
 credit-risk-dataset/
-*.csv
+!credit-risk-dataset/credit_risk_dataset.csv   # keep the dataset if needed
+
+# Git
+.git/
+.gitignore

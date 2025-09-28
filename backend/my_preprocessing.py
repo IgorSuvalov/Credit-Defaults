@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 import random
+import joblib
 
 # Random seed for reproducibility
 random.seed(42)
@@ -35,6 +36,7 @@ FEATURE_COLS = [
 ]
 TARGET = "loan_status"
 
+
 def preprocess(df):
     keep = FEATURE_COLS + [TARGET]
     df = df[keep].copy()
@@ -46,3 +48,4 @@ def preprocess(df):
     df = df.dropna()
 
     return df
+

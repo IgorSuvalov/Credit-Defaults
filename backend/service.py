@@ -1,7 +1,11 @@
+from pathlib import Path
+import numpy as np
 import joblib
-from fastapi import FastAPI
+import xgboost as xgb
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+
 
 class ClientData(BaseModel):
     age: int
@@ -26,8 +30,31 @@ app.add_middleware(
 )
 
 # Load model and feature columns
-model = joblib.load("backend/model.pkl")
-feature_cols = joblib.load("backend/feature_cols.pkl")
+
+MODEL_JSON = Path("backend/xgboost.json")
+FEATURE_COLS_PKL = Path("backend/feature_cols.pkl")
+
+# Stuff below is result of debugging paths and pkl/json models not being fitted...
+
+if not MODEL_JSON.exists():
+    raise RuntimeError(f"Missing model file: {MODEL_JSON}")
+if not FEATURE_COLS_PKL.exists():
+    raise RuntimeError(f"Missing feature columns file: {FEATURE_COLS_PKL}")
+
+feature_cols = joblib.load(FEATURE_COLS_PKL)
+
+# Try to load as sklearn wrapper first; if that fails, fall back to Booster
+_MODEL_MODE = "sklearn"
+_model_clf = None
+_model_booster = None
+try:
+    _model_clf = xgb.XGBClassifier()
+    _model_clf.load_model(MODEL_JSON)  # loads fitted weights into wrapper
+except Exception:
+    _MODEL_MODE = "booster"
+    _model_clf = None
+    _model_booster = xgb.Booster()
+    _model_booster.load_model(MODEL_JSON)
 
 
 def hom_own(x):
@@ -40,7 +67,6 @@ def hom_own(x):
 
 @app.post("/score")
 def score(data: ClientData):
-
     row = {
         "person_age": data.age,
         "person_income": data.income,
@@ -53,7 +79,7 @@ def score(data: ClientData):
     intent_key = str(data.loan_intent).strip().lower()
 
     X_row = []
-    for col in row:
+    for col in feature_cols:
         if col in row:
             X_row.append(row[col])
         elif col.startswith("loan_intent_"):
@@ -62,6 +88,18 @@ def score(data: ClientData):
         else:
             X_row.append(0.0)
 
-    yhat = model.predict([X_row])[0].item()  # 1 is default predicted, 0 is approved
-    approved = not yhat
-    return {"approved": approved}
+    X = np.asarray([X_row], dtype=float)
+
+    # predict probability of default
+    if _MODEL_MODE == "sklearn":
+        proba_default = float(_model_clf.predict_proba(X)[0, 1])
+    else:
+        dmat = xgb.DMatrix(X)
+        proba_default = float(_model_booster.predict(dmat)[0])
+
+    approved = bool(proba_default < 0.5)
+    return {
+        "approved": approved,
+        #   "prob_default": proba_default,  # helpful for UI thresholds
+        #   "model_mode": _MODEL_MODE,      # 'sklearn' or 'booster' for debugging
+    }

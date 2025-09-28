@@ -1,6 +1,7 @@
 import pandas as pd
 import inspect
 import xgboost as xgb
+import joblib
 from backend.my_preprocessing import preprocess
 from pathlib import Path
 from sklearn.model_selection import train_test_split
@@ -9,10 +10,14 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 project_root = Path(__file__).parent.parent
 csv_path = project_root / "credit-risk-dataset" / "credit_risk_dataset.csv"
 df = pd.read_csv(csv_path)
+
 data = preprocess(df)
+
 
 X_df = data.drop(columns=["loan_status"]).copy()
 y = data["loan_status"].astype(int).values
+
+feature_cols = X_df.columns.tolist()
 
 bool_cols = X_df.select_dtypes(include=["bool"]).columns.tolist()
 for c in bool_cols:
@@ -93,3 +98,17 @@ print("Accuracy:", f"{accuracy_score(y_test, y_pred) * 100:.0f}%")
 print("Precision:", f"{precision_score(y_test, y_pred) * 100:.0f}%")
 print("Recall:", f"{recall_score(y_test, y_pred) * 100:.0f}%")
 print("f1 score:", f"{f1_score(y_test, y_pred) * 100:.0f}%")
+
+
+out_dir = Path("./backend")
+out_dir.mkdir(parents=True, exist_ok=True)
+
+if trained_with_classifier:
+    # sklearn wrapper was fitted → safe to save through wrapper
+    model.save_model(out_dir / "xgboost.json")
+    joblib.dump(feature_cols, out_dir / "feature_cols.pkl")
+else:
+    # Booster path → save the booster
+    booster = bst                          # make sure `bst` is in scope here
+    booster.save_model(out_dir / "xgboost.json")
+    joblib.dump(feature_cols, out_dir / "feature_cols.pkl")

@@ -93,3 +93,5 @@ print("Accuracy:", f"{accuracy_score(y_test, y_pred) * 100:.0f}%")
 print(f"Precision: {precision * 100:.0f}%")
 print(f"Recall: {recall * 100:.0f}%")
 print(f"f1 score: {f1_score(y_test, y_pred) * 100:.0f}%")
+
+torch.save(model.state_dict(), "./backend/nn_model.pth")
