@@ -29,6 +29,7 @@ FEATURE_COLS = [
     "person_income",
     "person_home_ownership",
     "person_emp_length",
+    "loan_intent",
     "loan_amnt",
     "cb_person_default_on_file",
 ]
