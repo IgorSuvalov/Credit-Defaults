@@ -14,7 +14,7 @@ ENV/
 # Jupyter & notebooks
 *.ipynb
 .ipynb_checkpoints/
-Notebooks/
+../Notebooks/
 
 # Node & frontend
 node_modules/
