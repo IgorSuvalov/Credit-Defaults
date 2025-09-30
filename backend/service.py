@@ -2,10 +2,9 @@ from pathlib import Path
 import numpy as np
 import joblib
 import xgboost as xgb
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import Request
 
 class ClientData(BaseModel):
     age: int
@@ -43,7 +42,6 @@ if not FEATURE_COLS_PKL.exists():
 
 feature_cols = joblib.load(FEATURE_COLS_PKL)
 
-print("feature_cols".upper())
 
 # Try to load as sklearn wrapper first; if that fails, fall back to Booster
 _MODEL_MODE = "sklearn"
