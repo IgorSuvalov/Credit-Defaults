@@ -1,20 +1,39 @@
 version: "3.9"
 
 services:
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:latest
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --backend-store-uri file:///mlruns
+      --default-artifact-root file:///mlartifacts
+    volumes:
+      - ./mlruns:/mlruns
+      - ./mlartifacts:/mlartifacts
+    ports:
+      - "5000:5000"
+
   backend:
     build:
-        context: .
-        dockerfile: backend/Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: credit-backend
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - MLFLOW_REGISTRY_URI=http://mlflow:5000
     ports:
       - "8004:8004"
+    depends_on:
+      - mlflow
 
   frontend:
     build:
-        context: .
-        dockerfile: frontend/Dockerfile
-        args:
-          VITE_APP_URL: http://localhost:8004
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        VITE_APP_URL: http://localhost:8004
     container_name: credit-frontend
     ports:
       - "5173:80"

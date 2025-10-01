@@ -1,10 +1,9 @@
-from pathlib import Path
 import numpy as np
-import joblib
-import xgboost as xgb
+import mlflow
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+
 
 class ClientData(BaseModel):
     age: int
@@ -28,33 +27,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load model and feature columns
+feature_cols = ['person_age', 'person_income', 'person_home_ownership', 'person_emp_length', 'loan_amnt',
+                'cb_person_default_on_file', 'loan_intent_EDUCATION', 'loan_intent_HOMEIMPROVEMENT',
+                'loan_intent_MEDICAL', 'loan_intent_PERSONAL', 'loan_intent_VENTURE']
 
-MODEL_JSON = Path("backend/xgboost.json")
-FEATURE_COLS_PKL = Path("backend/feature_cols.pkl")
+model_name = "XGBoost with SMOTETomek"
+model_version = 1
+model_uri = f"models:/{model_name}@champion"
 
-# Stuff below is result of debugging paths and pkl/json models not being fitted...
-
-if not MODEL_JSON.exists():
-    raise RuntimeError(f"Missing model file: {MODEL_JSON}")
-if not FEATURE_COLS_PKL.exists():
-    raise RuntimeError(f"Missing feature columns file: {FEATURE_COLS_PKL}")
-
-feature_cols = joblib.load(FEATURE_COLS_PKL)
-
-
-# Try to load as sklearn wrapper first; if that fails, fall back to Booster
-_MODEL_MODE = "sklearn"
-_model_clf = None
-_model_booster = None
-try:
-    _model_clf = xgb.XGBClassifier()
-    _model_clf.load_model(MODEL_JSON)  # loads fitted weights into wrapper
-except Exception:
-    _MODEL_MODE = "booster"
-    _model_clf = None
-    _model_booster = xgb.Booster()
-    _model_booster.load_model(MODEL_JSON)
+loaded_model = mlflow.xgboost.load_model(model_uri)
 
 
 def hom_own(x):
@@ -67,7 +48,6 @@ def hom_own(x):
 
 @app.post("/score")
 def score(data: ClientData):
-
     row = {
         "person_age": data.age,
         "person_income": data.income,
@@ -91,16 +71,9 @@ def score(data: ClientData):
 
     X = np.asarray([X_row], dtype=float)
 
-    # predict probability of default
-    if _MODEL_MODE == "sklearn":
-        proba_default = float(_model_clf.predict_proba(X)[0, 1])
-    else:
-        dmat = xgb.DMatrix(X)
-        proba_default = float(_model_booster.predict(dmat)[0])
+    proba_default = float(loaded_model.predict_proba(X)[0, 1])
 
     approved = bool(proba_default < 0.5)
     return {
         "approved": approved,
-        #   "prob_default": proba_default,  # helpful for UI thresholds
-        #   "model_mode": _MODEL_MODE,      # 'sklearn' or 'booster' for debugging
     }
