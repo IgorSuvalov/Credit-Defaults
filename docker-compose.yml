@@ -33,7 +33,7 @@ services:
       context: .
       dockerfile: frontend/Dockerfile
       args:
-        VITE_APP_URL: http://localhost:8004
+        VITE_API_URL: http://localhost:8004
     container_name: credit-frontend
     ports:
       - "5173:80"

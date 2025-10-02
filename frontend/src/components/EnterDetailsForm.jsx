@@ -61,11 +61,12 @@ export default function EnterDetailsForm({ onResult }) {
       <div className="form-grid">
         <div>
           <label className="label">Age</label>
-          <input className="input" type="number" min="0" value={age} onChange={(e)=>setAge(e.target.value)} required />
+          <input className="input" type="number" min="0" max="120" value={age} onChange={(e)=>setAge(e.target.value)} required />
         </div>
         <div>
           <label className="label">Annual Income</label>
-          <input className="input" type="number" min="0" value={income} onChange={(e)=>setIncome(e.target.value)} required />
+          <input className="input" type="number" min="0" max="100000000" value={income}
+                 onChange={(e)=>setIncome(e.target.value)} required />
         </div>
         <div>
           <label className="label">Home Ownership</label>
@@ -78,11 +79,19 @@ export default function EnterDetailsForm({ onResult }) {
         </div>
         <div>
           <label className="label">Employment Length (years)</label>
-          <input className="input" type="number" step="0.1" min="0" value={empLength} onChange={(e)=>setEmpLength(e.target.value)} required />
+          <input className="input" type="number" min="0" max="110" value={empLength} onChange={(e)=>setEmpLength(e.target.value)}
+                 onInvalid={(e) => {
+                   const target = e.target;
+                   if (target.value.rangeOverflow) {target.setCustomValidity("Employment length seems too high. Please enter a realistic number.");
+                   } else if (target.value.rangeUnderflow) {target.setCustomValidity("Employment length cannot be negative.");
+                   } else if (target.value.valueMissing) {target.setCustomValidity("Please fill out this field.");}
+                 }}
+                 onInput={(e) => e.target.setCustomValidity("")} required />
         </div>
         <div>
           <label className="label">Loan Amount</label>
-          <input className="input" type="number" min="0" value={loanAmount} onChange={(e)=>setLoanAmount(e.target.value)} required />
+          <input className="input" type="number" min="1" max="1000000000" value={loanAmount}
+                 onChange={(e)=>setLoanAmount(e.target.value)} required />
         </div>
         <div>
           <label className="label">Default on File</label>

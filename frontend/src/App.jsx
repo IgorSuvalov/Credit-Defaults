@@ -30,12 +30,6 @@ export default function App() {
               <div className={`pill ${result.approved ? "ok" : "no"}`}>
                 {result.approved ? "Approved!" : "Denied :("}
               </div>
-
-              {"prob_default" in result && (
-                <div className="mono">
-                  Model probability of default: {Number(result.prob_default).toFixed(3)}
-                </div>
-              )}
             </div>
           )}
         </div>
