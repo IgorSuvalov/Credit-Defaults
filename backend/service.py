@@ -28,7 +28,7 @@ app.add_middleware(
 )
 
 feature_cols = ['person_age', 'person_income', 'person_home_ownership', 'person_emp_length', 'loan_amnt',
-                'cb_person_default_on_file', 'loan_intent_EDUCATION', 'loan_intent_HOMEIMPROVEMENT',
+                'cb_person_default_on_file', 'loan_intent_DEBTCONSOLIDATION', 'loan_intent_EDUCATION', 'loan_intent_HOMEIMPROVEMENT',
                 'loan_intent_MEDICAL', 'loan_intent_PERSONAL', 'loan_intent_VENTURE']
 
 model_name = "XGBoost with SMOTETomek"
