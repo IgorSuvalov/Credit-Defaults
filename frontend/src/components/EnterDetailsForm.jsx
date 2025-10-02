@@ -103,7 +103,7 @@ export default function EnterDetailsForm({ onResult }) {
         <div style={{ gridColumn: "1 / -1" }}>
           <label className="label">Loan Intent</label>
           <select className="select" value={loanIntent} onChange={(e)=>setLoanIntent(e.target.value)}>
-            <option value="bebtconsolidation">Debt Consolidation</option>
+            <option value="debtconsolidation">Debt Consolidation</option>
             <option value="personal">Personal</option>
             <option value="education">Education</option>
             <option value="medical">Medical</option>
