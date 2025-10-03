@@ -26,11 +26,11 @@ class Intent(str, Enum):
 class ClientData(BaseModel):
     age: int = Field(ge=18, le=120)
     income: int = Field(ge=0, le=100000000)
-    home_ownership: str = Home
+    home_ownership: Home
     employment_length: float = Field(ge=0, le=110)
     loan_amount: int = Field(ge=1, le=1000000000)
     def_on_file: float = Field(ge=0, le=1)
-    loan_intent: str = Intent
+    loan_intent: Intent
 
 
 app = FastAPI()
@@ -97,13 +97,13 @@ def score(data: ClientData):
     row = {
         "person_age": data.age,
         "person_income": data.income,
-        "person_home_ownership": hom_own(data.home_ownership),
+        "person_home_ownership": hom_own(data.home_ownership.value),
         "person_emp_length": data.employment_length,
         "loan_amnt": data.loan_amount,
         "cb_person_default_on_file": data.def_on_file,
     }
 
-    intent_key = str(data.loan_intent).strip().upper()
+    intent_key = data.loan_intent.value.strip().upper()
 
     X_row = []
     for col in feature_cols:

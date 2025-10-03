@@ -12,7 +12,7 @@ test_payloads = {
 }
 
 
-def return_503_when_model_missing(client: TestClient, monkeypatch):
+def test_return_503_when_model_missing(client: TestClient, monkeypatch):
     def fail_load_model():
         raise Exception("Model file not found")
 

@@ -37,7 +37,7 @@ services:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "python", "-c",
-      "import urllib.request; urllib.request.urlopen('http://localhost:8004/ready', timeout=2)"]
+      "import urllib.request; urllib.request.urlopen('http://localhost:8004/live', timeout=2)"]
       interval: 5s
       timeout: 3s
       retries: 10
