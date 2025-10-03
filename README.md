@@ -35,6 +35,11 @@ We need to:
 - **Testing**:
   - Pytest (unit and integration tests)
   - FastAPI TestClient (for API endpoint testing)
+ 
+## Video Demo
+
+https://github.com/user-attachments/assets/3f5448bc-9e4e-47c5-bfef-030c1b279e0f
+
 ## Quickstart
 
 ```bash
@@ -44,8 +49,8 @@ git clone
 # 2) Build and run everything with Docker Compose
 docker-compose up --build
 
-# 3) Run the notebook to train and log the model in MLflow (uncomment pytorch in requirements.txt first)
-jupyter notebook Notebooks/Notebook.ipynb
+# 3) Run the notebook to train and log the model in MLflow (uncomment PyTorch in requirements.txt first)
+Jupyter Notebook Notebooks/Notebook.ipynb
 http://localhost:5000 #to check the model run ID
 
 # 4) Access the apps 
