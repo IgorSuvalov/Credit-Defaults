@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, {useRef, useState} from "react";
 import api from "../api";
 
 const isEmptyOrNotNumber = (v) => v === "" || Number.isNaN(Number(v));
 
 export default function EnterDetailsForm({ onResult }) {
+  const formRef = useRef(null);
   const [age, setAge] = useState("");
   const [income, setIncome] = useState("");
   const [homeOwnership, setHomeOwnership] = useState("rent");
@@ -17,10 +18,17 @@ export default function EnterDetailsForm({ onResult }) {
   function validate() {
     if ([age, income, empLength, loanAmount].some(isEmptyOrNotNumber)) {
       setError("Please fill all numeric fields with valid numbers.");
+      formRef.current?.reportValidity();
       return false;
     }
     if (Number(age) <= 0 || Number(loanAmount) <= 0 || Number(income) < 0 || Number(empLength) < 0) {
       setError("Age and loan amount must be > 0; income and employment length must be ≥ 0.");
+      formRef.current?.reportValidity();
+      return false;
+    }
+
+    if (Number(empLength) > Number(age)) {
+      setError("Employment length cannot exceed age.");
       return false;
     }
     setError(null);
@@ -29,6 +37,9 @@ export default function EnterDetailsForm({ onResult }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
+
+    if (!e.currentTarget.checkValidity()) return;
+
     if (!validate()) return;
 
     const payload = {
@@ -61,12 +72,25 @@ export default function EnterDetailsForm({ onResult }) {
       <div className="form-grid">
         <div>
           <label className="label">Age</label>
-          <input className="input" type="number" min="0" max="120" value={age} onChange={(e)=>setAge(e.target.value)} required />
+          <input className="input" type="number" min="18" max="120" value={age} onChange={(e)=>setAge(e.target.value)}
+                 onInvalid={(e) => {
+                   const target = e.target;
+                     if (target.validity.rangeOverflow) {target.setCustomValidity("Age seems too high. Please enter a realistic age.");
+                     } else if (target.validity.rangeUnderflow) {target.setCustomValidity("You must be at least 18 years old to apply.");
+                     } else if (target.validity.valueMissing) {target.setCustomValidity("Please fill out this field.");}
+                 }}
+                 onInput={(e) => e.target.setCustomValidity("")} required />
         </div>
         <div>
           <label className="label">Annual Income</label>
           <input className="input" type="number" min="0" max="100000000" value={income}
-                 onChange={(e)=>setIncome(e.target.value)} required />
+                 onChange={(e)=>setIncome(e.target.value)}
+                 onInvalid={(e) => {
+                   const target = e.target;
+                   if (target.validity.rangeOverflow) {target.setCustomValidity("Income seems too high. Please enter a realistic number.");
+                   } else if (target.validity.valueMissing) {target.setCustomValidity("Please fill out this field.");}
+                 }}
+                 onInput={(e) => e.target.setCustomValidity("")} required />
         </div>
         <div>
           <label className="label">Home Ownership</label>
@@ -82,9 +106,9 @@ export default function EnterDetailsForm({ onResult }) {
           <input className="input" type="number" min="0" max="110" value={empLength} onChange={(e)=>setEmpLength(e.target.value)}
                  onInvalid={(e) => {
                    const target = e.target;
-                   if (target.value.rangeOverflow) {target.setCustomValidity("Employment length seems too high. Please enter a realistic number.");
-                   } else if (target.value.rangeUnderflow) {target.setCustomValidity("Employment length cannot be negative.");
-                   } else if (target.value.valueMissing) {target.setCustomValidity("Please fill out this field.");}
+                   if (target.validity.rangeOverflow) {target.setCustomValidity("Employment length seems too high. Please enter a realistic number.");
+                   } else if (target.validity.rangeUnderflow) {target.setCustomValidity("Employment length cannot be negative.");
+                   } else if (target.validity.valueMissing) {target.setCustomValidity("Please fill out this field.");}
                  }}
                  onInput={(e) => e.target.setCustomValidity("")} required />
         </div>

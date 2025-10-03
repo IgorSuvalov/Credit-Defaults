@@ -3,18 +3,35 @@ import mlflow
 import os, time
 from fastapi import HTTPException
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 from fastapi.middleware.cors import CORSMiddleware
+from enum import Enum
+
+
+class Home(str, Enum):
+    other = "other"
+    rent = "rent"
+    mortgage = "mortgage"
+    own = "own"
+
+
+class Intent(str, Enum):
+    debtconsolidation = "debtconsolidation"
+    personal = "personal"
+    education = "education"
+    medical = "medical"
+    venture = "venture"
+    homeimprovement = "homeimprovement"
 
 
 class ClientData(BaseModel):
-    age: int
-    income: int
-    home_ownership: str
-    employment_length: float
-    loan_amount: int
-    def_on_file: float
-    loan_intent: str
+    age: int = Field(ge=18, le=120)
+    income: int = Field(ge=0, le=100000000)
+    home_ownership: str = Home
+    employment_length: float = Field(ge=0, le=110)
+    loan_amount: int = Field(ge=1, le=1000000000)
+    def_on_file: float = Field(ge=0, le=1)
+    loan_intent: str = Intent
 
 
 app = FastAPI()
@@ -30,7 +47,8 @@ app.add_middleware(
 )
 
 feature_cols = ['person_age', 'person_income', 'person_home_ownership', 'person_emp_length', 'loan_amnt',
-                'cb_person_default_on_file', 'loan_intent_DEBTCONSOLIDATION', 'loan_intent_EDUCATION', 'loan_intent_HOMEIMPROVEMENT',
+                'cb_person_default_on_file', 'loan_intent_DEBTCONSOLIDATION', 'loan_intent_EDUCATION',
+                'loan_intent_HOMEIMPROVEMENT',
                 'loan_intent_MEDICAL', 'loan_intent_PERSONAL', 'loan_intent_VENTURE']
 
 model_name = "XGBoost with SMOTETomek"
@@ -63,10 +81,12 @@ def get_model_or_503():
 def live():
     return {"status": "ok"}
 
+
 @app.get("/ready")
 def ready():
     _ = get_model_or_503()
     return {"status": "ready", "model_uri": model_uri}
+
 
 @app.post("/score")
 def score(data: ClientData):
