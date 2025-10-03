@@ -1,9 +1,8 @@
 import numpy as np
 import mlflow
-import os, time
 from fastapi import HTTPException
 from fastapi import FastAPI
-from pydantic import BaseModel,Field
+from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
 from enum import Enum
 
@@ -61,7 +60,7 @@ def hom_own(x):
     mapping = {"other": 0, "rent": 1, "mortgage": 2, "own": 3}
     key = str(x).strip().lower()
     if key not in mapping:
-        raise ValueError("home_ownership must be one of: other, rent, mortgage, own")
+        raise HTTPException(status_code=422, detail=f"home_ownership must be one of: other, rent, mortgage, own")
     return float(mapping[key])
 
 
@@ -90,6 +89,10 @@ def ready():
 
 @app.post("/score")
 def score(data: ClientData):
+    if float(data.employment_length) > float(data.age):
+        raise HTTPException(status_code=422, detail="employment_length cannot be greater than age")
+
+
     model = get_model_or_503()
     row = {
         "person_age": data.age,
