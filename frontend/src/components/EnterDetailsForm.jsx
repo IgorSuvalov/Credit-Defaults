@@ -118,7 +118,7 @@ export default function EnterDetailsForm({ onResult }) {
                  onChange={(e)=>setLoanAmount(e.target.value)} required />
         </div>
         <div>
-          <label className="label">Default on File</label>
+          <label className="label">Have you ever defaulted on a loan?</label>
           <select className="select" value={defOnFile} onChange={(e)=>setDefOnFile(e.target.value)}>
             <option value="no">No</option>
             <option value="yes">Yes</option>
