@@ -44,14 +44,14 @@ https://github.com/user-attachments/assets/3f5448bc-9e4e-47c5-bfef-030c1b279e0f
 
 ```bash
 # 1) Clone the repository
-git clone
+git clone https://github.com/IgorSuvalov/Credit-Defaults/
 
-# 2) Build and run everything with Docker Compose
-docker-compose up --build
-
-# 3) Run the notebook to train and log the model in MLflow (uncomment PyTorch in requirements.txt first)
+# 2) Run the notebook to train and log the model in MLflow (uncomment PyTorch in requirements.txt first)
 Jupyter Notebook Notebooks/Notebook.ipynb
 http://localhost:5000 #to check the model run ID
+
+# 3) Build and run everything with Docker Compose
+docker-compose up --build
 
 # 4) Access the apps 
 Frontend: http://localhost:5173
