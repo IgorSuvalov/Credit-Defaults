@@ -21,14 +21,14 @@ def test_return_503_when_model_missing(client: TestClient, monkeypatch):
     assert response.status_code == 503
 
 
-def test_ready_with_model(client: TestClient, monkeypatch, low_risk_model):
+def test_return_200_when_model_ready(client: TestClient, monkeypatch, low_risk_model):
     monkeypatch.setattr(svc, "_loaded_model", low_risk_model)
     response = client.get("/ready")
     assert response.status_code == 200
     assert response.json()["status"] == "ready"
 
 
-def test_denied_approved(client: TestClient, monkeypatch, low_risk_model, high_risk_model):
+def test_if_denied_approved_works(client: TestClient, monkeypatch, low_risk_model, high_risk_model):
     # Low risk model should approve
     monkeypatch.setattr(svc, "_loaded_model", low_risk_model)
     response = client.post("/score", json=test_payloads).json()
