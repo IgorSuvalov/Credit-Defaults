@@ -11,7 +11,8 @@ We need to:
 - Create a backend to serve the model and handle form submissions.
 ## System Architecture
 
-![A diagram showing the flow of data from the React frontend, through the FastAPI backend, to the MLflow server and storage.](./images/Diagram.drawio.svg)
+![A diagram showing the flow of data from the React frontend, through the FastAPI backend, to the MLflow server and storage.](https://github.com/user-attachments/assets/fd7f3041-aa4e-4c13-8f46-3071f583f472)
+
 
 ## Tech Stack
 
