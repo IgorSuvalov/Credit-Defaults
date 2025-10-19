@@ -39,7 +39,7 @@ We need to:
  
 ## Video Demo
 
-https://github.com/user-attachments/assets/3f5448bc-9e4e-47c5-bfef-030c1b279e0f
+[https://github.com/user-attachments/assets/3f5448bc-9e4e-47c5-bfef-030c1b279e0f](https://github.com/user-attachments/assets/ea59ad97-72a3-492e-afed-ae53b7f002ab)
 
 ## Quickstart
 
@@ -83,7 +83,7 @@ Directory structure:
     │   ├── app.py
     │   ├── ml_service.py
     │   ├── routes.py
-    │   ├── schema.py
+    │   ├── schemas.py
     │   └── .dockerignore
     ├── frontend/
     │   ├── Dockerfile
