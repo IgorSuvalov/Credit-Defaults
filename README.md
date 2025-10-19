@@ -52,7 +52,7 @@ Jupyter Notebook Notebooks/Notebook.ipynb
 http://localhost:5000 #to check the model run ID
 
 # 3) Build and run everything with Docker Compose
-docker-compose up --build
+docker compose up --build
 
 # 4) Access the apps 
 Frontend: http://localhost:5173
