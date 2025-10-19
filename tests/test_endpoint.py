@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-import backend.service as svc
+import backend.app as svc
 
 test_payloads = {
     "age": 25,

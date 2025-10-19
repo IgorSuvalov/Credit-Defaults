@@ -3,7 +3,7 @@ import types
 import numpy as np
 import pytest
 from fastapi.testclient import TestClient
-import backend.service as svc
+import backend.app as svc
 
 @pytest.fixture(autouse=True)
 def _reset_cache(monkeypatch):

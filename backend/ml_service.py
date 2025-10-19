@@ -1,49 +1,7 @@
 import numpy as np
 import mlflow
 from fastapi import HTTPException
-from fastapi import FastAPI
-from pydantic import BaseModel, Field
-from fastapi.middleware.cors import CORSMiddleware
-from enum import Enum
-
-
-class Home(str, Enum):
-    other = "other"
-    rent = "rent"
-    mortgage = "mortgage"
-    own = "own"
-
-
-class Intent(str, Enum):
-    debtconsolidation = "debtconsolidation"
-    personal = "personal"
-    education = "education"
-    medical = "medical"
-    venture = "venture"
-    homeimprovement = "homeimprovement"
-
-
-class ClientData(BaseModel):
-    age: int = Field(ge=18, le=120)
-    income: int = Field(ge=0, le=100000000)
-    home_ownership: Home
-    employment_length: float = Field(ge=0, le=110)
-    loan_amount: int = Field(ge=1, le=1000000000)
-    def_on_file: float = Field(ge=0, le=1)
-    loan_intent: Intent
-
-
-app = FastAPI()
-
-origins = ["http://localhost:5173", "http://localhost:8004", "http://127.0.0.1:5173"]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+from .schemas import ClientData
 
 feature_cols = ['person_age', 'person_income', 'person_home_ownership', 'person_emp_length', 'loan_amnt',
                 'cb_person_default_on_file', 'loan_intent_DEBTCONSOLIDATION', 'loan_intent_EDUCATION',
@@ -76,23 +34,7 @@ def get_model_or_503():
         raise HTTPException(status_code=503, detail=f"Model not available: {e}")
 
 
-@app.get("/live")
-def live():
-    return {"status": "ok"}
-
-
-@app.get("/ready")
-def ready():
-    _ = get_model_or_503()
-    return {"status": "ready", "model_uri": model_uri}
-
-
-@app.post("/score")
-def score(data: ClientData):
-    if float(data.employment_length) > float(data.age):
-        raise HTTPException(status_code=422, detail="employment_length cannot be greater than age")
-
-
+def predict_proba(data: ClientData):
     model = get_model_or_503()
     row = {
         "person_age": data.age,
@@ -116,10 +58,5 @@ def score(data: ClientData):
             X_row.append(0.0)
 
     X = np.asarray([X_row], dtype=float)
-
     proba_default = float(model.predict_proba(X)[0, 1])
-
-    approved = bool(proba_default < 0.5)
-    return {
-        "approved": approved,
-    }
+    return proba_default

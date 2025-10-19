@@ -79,7 +79,10 @@ Directory structure:
     ├── backend/
     │   ├── __init__.py
     │   ├── Dockerfile
-    │   ├── service.py
+    │   ├── app.py
+    │   ├── ml_service.py
+    │   ├── routes.py
+    │   ├── schema.py
     │   └── .dockerignore
     ├── frontend/
     │   ├── Dockerfile
